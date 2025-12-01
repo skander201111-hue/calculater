@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>حساب المعدل العام — 1ère secondaire</title>
+  <style>
+    :root{
+      --green:#16a34a;--red:#ef4444;--muted:#6b7280;
+      --bg-light:linear-gradient(135deg,#4f46e5,#0ea5e9,#14b8a6);
+      --bg-dark:#0b0f19;
+      --card-light:linear-gradient(180deg,#ffffff,#f9fafb);
+      --card-dark:#1c2433;
+      --text-light:#111827;
+      --text-dark:#f3f4f6;
+    }
+    body{
+      margin:0;font-family:Inter,system-ui;transition:0.4s;
+      background:var(--bg-light);background-size:400% 400%;
+      animation:gradientMove 12s ease infinite;
+      display:flex;flex-direction:column;align-items:center;padding:40px;
+      color:var(--text-light);
+    }
+    body.dark{
+      background:var(--bg-dark);animation:none;color:var(--text-dark);
+    }
+    @keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+    .landing{
+      text-align:center;margin-bottom:40px;
+    }
+    .landing h1{font-size:42px;margin:0 0 10px;font-weight:800}
+    .landing p{font-size:18px;opacity:0.8;margin:0}
+
+    .toggle-dark{
+      margin-top:18px;padding:10px 20px;border-radius:30px;border:0;
+      cursor:pointer;font-size:15px;font-weight:600;
+      background:#fff;color:#111;transition:0.3s;
+    }
+    body.dark .toggle-dark{background:#222;color:#eee;}
+    .toggle-dark:hover{transform:scale(1.05)}
+
+    .card{
+      width:100%;max-width:1000px;padding:26px;border-radius:18px;
+      background:var(--card-light);backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,0.4);
+      box-shadow:0 10px 35px rgba(0,0,0,0.15);
+      transition:0.4s;
+    }
+    body.dark .card{background:var(--card-dark);border:1px solid #333;}
+
+    .subjects{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:20px}
+    @media(max-width:800px){.subjects{grid-template-columns:1fr}}
+
+    .subject{
+      padding:16px;border-radius:12px;background:#fff;
+      border:1px solid #e5e7eb;transition:0.3s;
+    }
+    body.dark .subject{background:#242f43;border-color:#3a475d;}
+    .subject:hover{transform:translateY(-3px);box-shadow:0 4px 14px rgba(0,0,0,0.12)}
+
+    input[type=text]{width:100%;padding:8px;border-radius:8px;border:1px solid #ccc;
+      margin-top:4px;font-size:14px}
+    body.dark input{background:#1a2333;border-color:#334155;color:#fff}
+
+    .controls{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap}
+    button{
+      padding:10px 18px;border-radius:10px;border:0;font-size:15px;
+      cursor:pointer;font-weight:600;transition:0.25s;
+    }
+    .btn-main{background:#4f46e5;color:#fff}
+    .btn-main:hover{transform:scale(1.07)}
+    .btn-secondary{background:transparent;border:2px solid #fff;color:#fff}
+    body.dark .btn-secondary{border-color:#444;color:#ddd}
+    .btn-secondary:hover{transform:scale(1.07)}
+
+    table{width:100%;margin-top:20px;border-collapse:collapse;font-size:15px}
+    th,td{padding:10px;border-bottom:1px solid #dfe3ea}
+    body.dark th,body.dark td{border-color:#3a475d}
+
+    .green{color:var(--green);font-weight:700}
+    .red{color:var(--red);font-weight:700}
+
+    .summary{display:flex;justify-content:space-between;margin-top:20px;font-size:18px}
+    @media(max-width:600px){.summary{flex-direction:column;gap:10px;text-align:center}}
+  </style>
+</head>
+<body>
+  <div class="landing">
+    <h1>📘 منصة حساب المعدل</h1>
+    <p>نظام كامل لحساب المعدل العام للتلميذ بطريقة سهلة </p>
+    <button class="toggle-dark" onclick="toggleDarkMode()">Dark🌙 </button>
+  </div>
+
+  <div class="card">
+    <div id="formContainer" class="subjects"></div>
+    <div class="controls">
+      <button id="calcBtn" class="btn-main">حساب المعدل</button>
+      <button id="resetBtn" class="btn-secondary">إعادة تعيين</button>
+    </div>
+    <div id="results"></div>
+  </div>
+
+<script>
+function toggleDarkMode(){document.body.classList.toggle('dark');}
+
+const coeffs={"Math":3,"French":2.5,"English":1.5,"History":1.5,"Geography":1.5,"Islamic":1,"Madeniya":1,"Info":1.5,"Arabic":3,"Physique":2.5,"Science":1.5,"Technique":1,"Sport":1};
+const container=document.getElementById('formContainer');
+
+Object.entries(coeffs).forEach(([s,c])=>{
+  const b=document.createElement('div');b.className='subject';b.innerHTML=`<h3>${s} <small style="opacity:.6">(معامل ${c})</small></h3>`;
+  if(s==='Math'){b.innerHTML+=`<label>Contrôle 1<input type=text data-subj=${s} data-field=c1></label><label>Contrôle 2<input type=text data-subj=${s} data-field=c2></label><label>Synthèse<input type=text data-subj=${s} data-field=synth></label>`;} 
+  else if(s==='Sport'){b.innerHTML+=`<label>Contrôle<input type=text data-subj=${s} data-field=controle></label><label>Synthèse<input type=text data-subj=${s} data-field=synth></label>`;} 
+  else {b.innerHTML+=`<label>Contrôle<input type=text data-subj=${s} data-field=controle></label><label>Synthèse<input type=text data-subj=${s} data-field=synth></label><label>Oral<input type=text data-subj=${s} data-field=oral></label>`;}
+  container.appendChild(b);
+});
+
+function parseMark(s){s=String(s).trim().replace(',', '.');let v=Number(s);return isFinite(v)?v:NaN}
+function val(v){return !isNaN(v)&&v>=0&&v<=20}
+function get(subj){let o={};document.querySelectorAll(`[data-subj="${subj}"]`).forEach(i=>o[i.dataset.field]=i.value);return o}
+
+document.getElementById('calcBtn').onclick=()=>{
+  let res={};let sum=0;let valid=true;let err=null;
+  Object.entries(coeffs).forEach(([s,c])=>{
+    let d=get(s),avg;
+    if(s==='Math'){let c1=parseMark(d.c1),c2=parseMark(d.c2),sy=parseMark(d.synth);if(!val(c1)||!val(c2)||!val(sy)){valid=false;err=s;}else avg=(c1+c2+2*sy)/4;}
+    else if(s==='Sport'){let co=parseMark(d.controle),sy=parseMark(d.synth);if(!val(co)||!val(sy)){valid=false;err=s;}else avg=(co+2*sy)/3;}
+    else{let co=parseMark(d.controle),sy=parseMark(d.synth),or=parseMark(d.oral);if(!val(co)||!val(sy)||!val(or)){valid=false;err=s;}else avg=(co+2*sy+or)/4;}
+    if(!isNaN(avg)){res[s]={avg,coeff:c,weighted:avg*c};sum+=avg*c;}
+  });
+  let r=document.getElementById('results');r.innerHTML='';
+  if(!valid){r.innerHTML=`<div style="margin-top:20px;padding:12px;border-radius:10px;background:#fee2e2;color:#b91c1c">خطأ في إدخال علامات مادة: ${err}</div>`;return;}
+  let tot=Object.values(coeffs).reduce((a,b)=>a+b,0),mg=sum/tot;
+  let h='<table><tr><th>المادة</th><th>Moy</th><th>Coeff</th><th>Contrib</th></tr>';
+  Object.entries(res).forEach(([s,i])=>{h+=`<tr><td>${s}</td><td class="${i.avg>=10?'green':'red'}">${i.avg.toFixed(2)}</td><td>${i.coeff}</td><td>${i.weighted.toFixed(2)}</td></tr>`});
+  h+='</table>';
+  h+=`<div class="summary"><div>⚖️ المجموع: ${tot}</div><div>🎯 المعدل العام: <span class="${mg>=10?'green':'red'}">${mg.toFixed(2)}</span></div></div>`;
+  r.innerHTML=h;
+};
+
+document.getElementById('resetBtn').onclick=()=>{document.querySelectorAll('input').forEach(i=>i.value='');document.getElementById('results').innerHTML=''};
+</script>
+</body>
+</html>
